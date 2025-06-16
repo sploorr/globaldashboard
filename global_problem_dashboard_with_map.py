@@ -2,92 +2,47 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Sample dataset
+# Sample dataset for hunger problem only
 DATA = [
-    {
-        "Country": "Nigeria",
-        "Problem": "End Hunger",
-        "Estimated Cost (Billion USD)": 12,
-        "People Affected (Millions)": 98
-    },
-    {
-        "Country": "India",
-        "Problem": "End Hunger",
-        "Estimated Cost (Billion USD)": 25,
-        "People Affected (Millions)": 189
-    },
-    {
-        "Country": "Ethiopia",
-        "Problem": "Universal Access to Clean Water",
-        "Estimated Cost (Billion USD)": 5,
-        "People Affected (Millions)": 57
-    },
-    {
-        "Country": "Democratic Republic of the Congo",
-        "Problem": "Universal Access to Clean Water",
-        "Estimated Cost (Billion USD)": 4,
-        "People Affected (Millions)": 50
-    },
-    {
-        "Country": "Mozambique",
-        "Problem": "Eradicate Malaria",
-        "Estimated Cost (Billion USD)": 0.6,
-        "People Affected (Millions)": 30
-    },
-    {
-        "Country": "Bangladesh",
-        "Problem": "Universal Basic Education",
-        "Estimated Cost (Billion USD)": 2.5,
-        "People Affected (Millions)": 20
-    },
-    {
-        "Country": "Pakistan",
-        "Problem": "Universal Electricity Access",
-        "Estimated Cost (Billion USD)": 4,
-        "People Affected (Millions)": 45
-    }
+    {"Country": "Nigeria", "Estimated Cost (Billion USD)": 12},
+    {"Country": "India", "Estimated Cost (Billion USD)": 25},
+    {"Country": "Ethiopia", "Estimated Cost (Billion USD)": 6},
+    {"Country": "Bangladesh", "Estimated Cost (Billion USD)": 5}
 ]
 
 # Create DataFrame
 country_df = pd.DataFrame(DATA)
 
 # Streamlit page config
-st.set_page_config(page_title="Global Problem Country Breakdown", layout="wide")
-st.title("🌍 Global Problem Solving Dashboard – Country Breakdown")
+st.set_page_config(page_title="Global Problem Selector", layout="wide")
 
-# Sidebar Filters
-with st.sidebar:
-    st.header("🔎 Filters")
-    selected_problem = st.multiselect("Select Problem(s):", options=country_df["Problem"].unique(), default=country_df["Problem"].unique())
-    selected_country = st.multiselect("Select Country/Countries:", options=country_df["Country"].unique(), default=country_df["Country"].unique())
+# Landing Page Prompt
+st.markdown("""
+    <div style='text-align: center; margin-top: 100px;'>
+        <h1 style='font-size: 50px;'>I want to solve:</h1>
+    </div>
+""", unsafe_allow_html=True)
 
-# Filtered Data
-filtered_df = country_df[
-    country_df["Problem"].isin(selected_problem) &
-    country_df["Country"].isin(selected_country)
-]
+# Problem selection
+problem = st.selectbox("", ["End Hunger", "Access to Clean Water", "Eradicate Malaria", "Universal Basic Education", "Universal Electricity Access"], index=0)
 
-# Display Table
-st.subheader("📊 Country-Level Problem Cost Table")
-st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
-
-# Interactive Map
-st.subheader("🗺️ Estimated Cost by Country (Map View)")
-if not filtered_df.empty:
-    fig_map = px.choropleth(
-        filtered_df,
+# When a problem is selected
+if problem:
+    st.markdown(f"### 🌍 Cost to {problem} by Country")
+    
+    # Interactive map for selected problem (sample for Hunger only)
+    fig = px.choropleth(
+        country_df,
         locations="Country",
         locationmode="country names",
         color="Estimated Cost (Billion USD)",
         hover_name="Country",
-        hover_data={"Problem": True, "Estimated Cost (Billion USD)": True, "People Affected (Millions)": True},
-        color_continuous_scale="Viridis",
-        title="Estimated Cost by Country"
+        hover_data={"Estimated Cost (Billion USD)": True},
+        color_continuous_scale="Reds",
+        title=f"Estimated Cost to {problem}"
     )
-    fig_map.update_layout(margin={"r":0,"t":50,"l":0,"b":0})
-    st.plotly_chart(fig_map, use_container_width=True)
-else:
-    st.info("No data to display based on selected filters.")
+    fig.update_layout(margin={"r":0,"t":50,"l":0,"b":0})
+    st.plotly_chart(fig, use_container_width=True)
 
 # Footer
-st.caption("Sample data only. Sources include WHO, UN FAO, World Bank, UNICEF, IEA, UNESCO.")
+st.caption("Sample data only. Real-world estimates sourced from UN, World Bank, WHO, etc.")
