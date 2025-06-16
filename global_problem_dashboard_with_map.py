@@ -16,19 +16,30 @@ country_df = pd.DataFrame(DATA)
 # Streamlit page config
 st.set_page_config(page_title="Global Problem Selector", layout="wide")
 
-# Initial landing layout style
+# Improved CSS for vibecheck-style landing
 st.markdown("""
     <style>
+    html, body, [class*="css"]  {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f9f9f9;
+    }
     .centered {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 90vh;
         flex-direction: column;
+        text-align: center;
     }
     .selectbox-container {
         width: 300px;
-        text-align: center;
+        margin-top: 20px;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -37,7 +48,7 @@ st.markdown("""
 with st.container():
     st.markdown("""
     <div class="centered">
-        <h1 style='font-size: 60px;'>I want to solve:</h1>
+        <h1 style='font-size: 60px; color: #333;'>I want to solve:</h1>
         <div class="selectbox-container">
     """, unsafe_allow_html=True)
 
@@ -52,24 +63,35 @@ with st.container():
 if problem and problem != "":
     st.markdown(f"### 🌍 Estimated Cost to {problem} by Country")
 
-    # Create animated-style hover map
+    # Create hoverable interactive map
     fig = go.Figure(data=go.Choropleth(
         locations=country_df['ISO3'],
         z=country_df['Estimated Cost (Billion USD)'],
         text=country_df['Country'],
-        colorscale='Reds',
+        colorscale='YlOrRd',
         autocolorscale=False,
         reversescale=False,
-        marker_line_color='darkgray',
-        marker_line_width=0.5,
-        colorbar_title='Billions USD',
+        marker_line_color='white',
+        marker_line_width=0.8,
+        colorbar_title='Cost (Billions USD)',
         hovertemplate='<b>%{text}</b><br>Cost: $%{z}B<br><extra></extra>'
     ))
+
+    fig.update_geos(
+        visible=True,
+        resolution=110,
+        showcountries=True,
+        showcoastlines=True,
+        showland=True,
+        landcolor="lightgray",
+        coastlinecolor="white",
+        projection_type='natural earth'
+    )
 
     fig.update_layout(
         geo=dict(
             showframe=False,
-            showcoastlines=False,
+            showcoastlines=True,
             projection_type='natural earth'
         ),
         margin={"r":0,"t":30,"l":0,"b":0},
