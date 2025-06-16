@@ -63,7 +63,7 @@ if problem and problem != "":
         marker_line_color='darkgray',
         marker_line_width=0.5,
         colorbar_title='Billions USD',
-        hovertemplate='<b>%{text}</b><br>Cost: $%{z}B'<br><extra></extra>
+        hovertemplate='<b>%{text}</b><br>Cost: $%{z}B<br><extra></extra>'
     ))
 
     fig.update_layout(
